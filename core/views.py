@@ -37,6 +37,9 @@ class LivreListView(ListView):
         ctx = super().get_context_data(**kwargs)
         ctx['query'] = self.request.GET.get('q', '')
         ctx['total'] = self.get_queryset().count()
+        ctx['total_all'] = Livre.objects.count()
+        ctx['disponibles_count'] = Livre.objects.filter(disponible=True).count()
+        ctx['non_disponibles_count'] = Livre.objects.filter(disponible=False).count()
         return ctx
 
 

@@ -4,96 +4,153 @@
 {% block nav_accueil %}active{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">
-        <i class="bi bi-journal-bookmarks me-2"></i>Liste des livres
-        <span class="badge bg-secondary ms-2" style="font-size:0.7rem;">{{ total }} livre{{ total|pluralize }}</span>
-    </h2>
-    <a href="{% url 'livre-create' %}" class="btn btn-success">
-        <i class="bi bi-plus-lg me-1"></i>Ajouter un livre
+
+{# ── Stats ── #}
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon indigo">
+            <i class="bi bi-journal-bookmarks-fill"></i>
+        </div>
+        <div>
+            <div class="stat-value">{{ total_all }}</div>
+            <div class="stat-label">Total livres</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div>
+            <div class="stat-value">{{ disponibles_count }}</div>
+            <div class="stat-label">Disponibles</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red">
+            <i class="bi bi-x-circle-fill"></i>
+        </div>
+        <div>
+            <div class="stat-value">{{ non_disponibles_count }}</div>
+            <div class="stat-label">Non disponibles</div>
+        </div>
+    </div>
+</div>
+
+{# ── Page header ── #}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Liste des livres</h1>
+        <p class="page-subtitle">{{ total_all }} livre{{ total_all|pluralize }} dans la bibliothèque</p>
+    </div>
+    <a href="{% url 'livre-create' %}" class="btn-primary-custom">
+        <i class="bi bi-plus-lg"></i>
+        Ajouter un livre
     </a>
 </div>
 
-<div class="card mb-4">
-    <div class="card-body py-2">
-        <form method="get" class="d-flex gap-2">
+{# ── Search toolbar ── #}
+<div class="toolbar">
+    <form method="get" class="d-flex align-items-center gap-2">
+        <div class="search-wrap">
+            <i class="bi bi-search search-icon"></i>
             <input
                 type="text"
                 name="q"
                 value="{{ query }}"
-                class="form-control"
-                placeholder="Rechercher par titre ou auteur..."
+                class="search-input"
+                placeholder="Rechercher par titre ou auteur…"
             >
-            <button type="submit" class="btn btn-primary px-4">
-                <i class="bi bi-search me-1"></i>Rechercher
-            </button>
-            {% if query %}
-                <a href="{% url 'livre-list' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-x-lg"></i>
-                </a>
-            {% endif %}
-        </form>
-    </div>
+        </div>
+        <button type="submit" class="btn-ghost-custom">
+            <i class="bi bi-search"></i>
+            Rechercher
+        </button>
+        {% if query %}
+        <a href="{% url 'livre-list' %}" class="btn-ghost-custom">
+            <i class="bi bi-x-lg"></i>
+            Effacer
+        </a>
+        {% endif %}
+    </form>
 </div>
 
-<div class="card">
-    <div class="card-body p-0">
-        {% if livres %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-3">ID</th>
-                        <th>Titre</th>
-                        <th>Auteur</th>
-                        <th>ISBN</th>
-                        <th>Date publication</th>
-                        <th>Prix</th>
-                        <th class="text-center">Disponible</th>
-                        <th class="text-center pe-3">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for livre in livres %}
-                    <tr>
-                        <td class="ps-3 text-muted">{{ livre.id }}</td>
-                        <td class="fw-semibold">{{ livre.titre }}</td>
-                        <td>{{ livre.auteur }}</td>
-                        <td><code>{{ livre.isbn }}</code></td>
-                        <td>{{ livre.date_publication|date:"d/m/Y" }}</td>
-                        <td>{{ livre.prix }} €</td>
-                        <td class="text-center">
-                            {% if livre.disponible %}
-                                <span class="badge bg-success">Oui</span>
-                            {% else %}
-                                <span class="badge bg-danger">Non</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center pe-3">
-                            <a href="{% url 'livre-update' livre.pk %}" class="btn btn-warning btn-action me-1">
-                                <i class="bi bi-pencil-fill"></i> Modifier
+{# ── Table ── #}
+<div class="table-card">
+    {% if livres %}
+    <div class="table-responsive">
+        <table class="dark-table">
+            <thead>
+                <tr>
+                    <th style="width:52px">#</th>
+                    <th>Titre</th>
+                    <th>Auteur</th>
+                    <th>ISBN</th>
+                    <th>Publication</th>
+                    <th>Prix</th>
+                    <th class="text-center">Disponible</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for livre in livres %}
+                <tr>
+                    <td class="cell-id">{{ livre.id }}</td>
+                    <td class="cell-title">{{ livre.titre }}</td>
+                    <td class="cell-author">{{ livre.auteur }}</td>
+                    <td><span class="isbn-tag">{{ livre.isbn }}</span></td>
+                    <td>{{ livre.date_publication|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="prix-display">
+                            {{ livre.prix }}<span class="currency">€</span>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        {% if livre.disponible %}
+                            <span class="badge-dispo yes">
+                                <i class="bi bi-circle-fill"></i> Oui
+                            </span>
+                        {% else %}
+                            <span class="badge-dispo no">
+                                <i class="bi bi-circle-fill"></i> Non
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <a href="{% url 'livre-update' livre.pk %}" class="btn-icon edit" title="Modifier">
+                                <i class="bi bi-pencil-fill"></i>
                             </a>
-                            <a href="{% url 'livre-delete' livre.pk %}" class="btn btn-danger btn-action">
-                                <i class="bi bi-trash-fill"></i> Supprimer
+                            <a href="{% url 'livre-delete' livre.pk %}" class="btn-icon del" title="Supprimer">
+                                <i class="bi bi-trash-fill"></i>
                             </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-journal-x empty-icon"></i>
+        <p class="empty-title">Aucun livre trouvé</p>
+        {% if query %}
+            <p class="empty-sub">
+                Aucun résultat pour <strong style="color:var(--text-1)">"{{ query }}"</strong>
+            </p>
+            <a href="{% url 'livre-list' %}" class="btn-ghost-custom">
+                <i class="bi bi-arrow-left"></i>
+                Effacer la recherche
+            </a>
         {% else %}
-            <div class="text-center py-5 text-muted">
-                <i class="bi bi-inbox display-4"></i>
-                <p class="mt-3 mb-1 fs-5">Aucun livre trouvé.</p>
-                {% if query %}
-                    <p>Aucun résultat pour <strong>"{{ query }}"</strong>.</p>
-                    <a href="{% url 'livre-list' %}" class="btn btn-outline-secondary btn-sm">Effacer la recherche</a>
-                {% else %}
-                    <a href="{% url 'livre-create' %}" class="btn btn-success btn-sm mt-1">Ajouter le premier livre</a>
-                {% endif %}
-            </div>
+            <p class="empty-sub">La bibliothèque est vide. Commencez par ajouter un livre.</p>
+            <a href="{% url 'livre-create' %}" class="btn-primary-custom">
+                <i class="bi bi-plus-lg"></i>
+                Ajouter le premier livre
+            </a>
         {% endif %}
     </div>
+    {% endif %}
 </div>
+
 {% endblock %}

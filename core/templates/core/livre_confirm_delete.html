@@ -3,34 +3,43 @@
 {% block title %}Supprimer un livre — Bibliothèque{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7">
-        <div class="card border-danger">
-            <div class="card-header bg-danger text-white py-3">
-                <h4 class="mb-0">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmer la suppression
-                </h4>
-            </div>
-            <div class="card-body p-4 text-center">
-                <i class="bi bi-trash3 display-3 text-danger mb-3"></i>
-                <p class="fs-5 mb-1">Voulez-vous vraiment supprimer ce livre ?</p>
-                <p class="fw-bold fs-4 text-dark mb-1">"{{ object.titre }}"</p>
-                <p class="text-muted mb-4">par {{ object.auteur }}</p>
-                <p class="text-danger small mb-4">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Cette action est <strong>irréversible</strong>. Le livre sera définitivement supprimé.
-                </p>
-                <form method="post" class="d-flex justify-content-center gap-3">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger px-4">
-                        <i class="bi bi-trash-fill me-1"></i>Confirmer la suppression
-                    </button>
-                    <a href="{% url 'livre-list' %}" class="btn btn-outline-secondary px-4">
-                        <i class="bi bi-arrow-left me-1"></i>Annuler
-                    </a>
-                </form>
-            </div>
+
+<div class="delete-page-wrap">
+    <div class="delete-card">
+
+        <div class="delete-card-header">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <h4>Confirmer la suppression</h4>
         </div>
+
+        <div class="delete-card-body">
+            <div class="delete-icon-wrap">
+                <i class="bi bi-trash3-fill"></i>
+            </div>
+
+            <p class="delete-question">Voulez-vous vraiment supprimer ce livre ?</p>
+            <p class="delete-book-title">"{{ object.titre }}"</p>
+            <p class="delete-book-author">par {{ object.auteur }}</p>
+
+            <div class="delete-warning">
+                <i class="bi bi-info-circle-fill"></i>
+                Cette action est <strong>irréversible</strong>. Le livre sera définitivement supprimé.
+            </div>
+
+            <form method="post" class="delete-actions">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger-custom">
+                    <i class="bi bi-trash-fill"></i>
+                    Confirmer la suppression
+                </button>
+                <a href="{% url 'livre-list' %}" class="btn-ghost-custom">
+                    <i class="bi bi-arrow-left"></i>
+                    Annuler
+                </a>
+            </form>
+        </div>
+
     </div>
 </div>
+
 {% endblock %}
