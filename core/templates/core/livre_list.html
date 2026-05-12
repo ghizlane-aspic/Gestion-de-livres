@@ -1,0 +1,99 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Liste des livres — Bibliothèque{% endblock %}
+{% block nav_accueil %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">
+        <i class="bi bi-journal-bookmarks me-2"></i>Liste des livres
+        <span class="badge bg-secondary ms-2" style="font-size:0.7rem;">{{ total }} livre{{ total|pluralize }}</span>
+    </h2>
+    <a href="{% url 'livre-create' %}" class="btn btn-success">
+        <i class="bi bi-plus-lg me-1"></i>Ajouter un livre
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body py-2">
+        <form method="get" class="d-flex gap-2">
+            <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                class="form-control"
+                placeholder="Rechercher par titre ou auteur..."
+            >
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-search me-1"></i>Rechercher
+            </button>
+            {% if query %}
+                <a href="{% url 'livre-list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        {% if livres %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">ID</th>
+                        <th>Titre</th>
+                        <th>Auteur</th>
+                        <th>ISBN</th>
+                        <th>Date publication</th>
+                        <th>Prix</th>
+                        <th class="text-center">Disponible</th>
+                        <th class="text-center pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for livre in livres %}
+                    <tr>
+                        <td class="ps-3 text-muted">{{ livre.id }}</td>
+                        <td class="fw-semibold">{{ livre.titre }}</td>
+                        <td>{{ livre.auteur }}</td>
+                        <td><code>{{ livre.isbn }}</code></td>
+                        <td>{{ livre.date_publication|date:"d/m/Y" }}</td>
+                        <td>{{ livre.prix }} €</td>
+                        <td class="text-center">
+                            {% if livre.disponible %}
+                                <span class="badge bg-success">Oui</span>
+                            {% else %}
+                                <span class="badge bg-danger">Non</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center pe-3">
+                            <a href="{% url 'livre-update' livre.pk %}" class="btn btn-warning btn-action me-1">
+                                <i class="bi bi-pencil-fill"></i> Modifier
+                            </a>
+                            <a href="{% url 'livre-delete' livre.pk %}" class="btn btn-danger btn-action">
+                                <i class="bi bi-trash-fill"></i> Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox display-4"></i>
+                <p class="mt-3 mb-1 fs-5">Aucun livre trouvé.</p>
+                {% if query %}
+                    <p>Aucun résultat pour <strong>"{{ query }}"</strong>.</p>
+                    <a href="{% url 'livre-list' %}" class="btn btn-outline-secondary btn-sm">Effacer la recherche</a>
+                {% else %}
+                    <a href="{% url 'livre-create' %}" class="btn btn-success btn-sm mt-1">Ajouter le premier livre</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
